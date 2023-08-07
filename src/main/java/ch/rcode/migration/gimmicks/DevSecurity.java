@@ -6,10 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.RememberMeConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -46,21 +44,17 @@ public class DevSecurity {
             @Override
             protected void configure(HttpSecurity http) throws Exception {
                 log.info("configure executed in FirstConfiguration#InnerConfiguration");
-                //final Customizer<RememberMeConfigurer<HttpSecurity>> rememberMeCustomizer = rememberMeConfigurer -> rememberMeConfigurer.alwaysRemember(true).tokenValiditySeconds(300).userDetailsService(userDetailsService());
-                http.antMatcher("/**")
+                http
+                    .antMatcher("/**")
                     .authorizeRequests()
-                    .antMatchers("/**")
-                    .authenticated()
-                    .and()
-                    .httpBasic().disable()
-                    .cors().and()
-                    .csrf().disable()
+                        .antMatchers("/**")
+                        .authenticated()
+                    .and().httpBasic().disable()
+                    .cors()
+                    .and().csrf().disable()
                     .formLogin()
                         .loginPage("/login")
-                        .failureUrl("/login" + "?success=true")
-                        .defaultSuccessUrl("/login" + "?failure=true")
                         .permitAll();
-                        //.and().rememberMe(rememberMeCustomizer);
             }
         }
     }

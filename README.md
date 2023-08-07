@@ -6,8 +6,20 @@ The configuration using the old style `WebSecurityConfigurerAdapter` configurati
 
 When running the order of the applied configuration is following:
 
-![img.png](docs/pre-migration-screenshot.png/img.png)
+![pre-migration-screenshot.png](docs/pre-migration-screenshot.png)
 
 The [`migrated`](https://github.com/rawfg/spring-migration-gimmicks/tree/migrated/) branch contains the same `DevSecurity` class after the Spring Security migration: 
 - The `WebSecurityConfigurerAdapter` adapters were removed
 - The `SecurityFilterChain` beans were provided instead
+
+I updated the security rules to present the problem and added some more flow. 
+There is a login endpoint and a login page configuration as well as one in-memory user.
+When I navigate to the http://localhost:8080/hello I'm redirected to the http://localhost:8080/login:
+
+![login-controller.png](docs/login-controller.png)
+
+And after providing the user credentials  (**username**: _user_, **password**: _password_) I see:
+
+![hello-controller.png](docs/hello-controller.png)
+
+And **this is an expected behavior**.

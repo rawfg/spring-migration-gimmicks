@@ -18,57 +18,36 @@ import org.springframework.web.cors.CorsUtils;
 @Configuration
 public class DevSecurity {
 
-    @Configuration
-    public class FirstConfiguration {
-
-        @Configuration
-        @Order(Ordered.HIGHEST_PRECEDENCE)
-        public class InnerConfiguration {
-
-            private final Logger log = LoggerFactory.getLogger(InnerConfiguration.class);
-
-            @Bean
-            public InMemoryUserDetailsManager userDetailsService() {
-                UserDetails user = User.withUsername("user")
-                    .password(passwordEncoder().encode("password"))
-                    .roles("USER")
-                    .build();
-                return new InMemoryUserDetailsManager(user);
-            }
-
-            @Bean
-            public SecurityFilterChain innerChain(HttpSecurity http) throws Exception {
-                log.info("Bean innerChain built in InnerConfiguration");
-                http
-                    .antMatcher("/**")
-                    .authorizeRequests()
-                        .antMatchers("/**")
-                        .authenticated()
-                    .and().httpBasic().disable()
-                    .cors()
-                    .and().csrf().disable()
-                    .formLogin()
-                        .loginPage("/login")
-                        .permitAll();
-                return http.build();
-            }
-
-            @Bean
-            public PasswordEncoder passwordEncoder() {
-                return new BCryptPasswordEncoder();
-            }
-        }
+    @Bean
+    public InMemoryUserDetailsManager userDetailsService() {
+        UserDetails user = User.withUsername("user")
+                .password(passwordEncoder().encode("password"))
+                .roles("USER")
+                .build();
+        return new InMemoryUserDetailsManager(user);
     }
 
-    @Configuration
-    public class SecondConfiguration {
+    @Bean
+    @Order(0)
+    public SecurityFilterChain innerChain(HttpSecurity http) throws Exception {
+        http
+                .antMatcher("/**")
+                .authorizeRequests()
+                .antMatchers("/**")
+                .authenticated()
+                .and().httpBasic().disable()
+                .cors()
+                .and().csrf().disable()
+                .formLogin()
+                .loginPage("/login")
+                .permitAll();
+        return http.build();
+    }
 
-        private final Logger log = LoggerFactory.getLogger(SecondConfiguration.class);
-
-        @Bean
-        public SecurityFilterChain secondChain(HttpSecurity http) throws Exception {
-            log.info("Bean secondChain built in SecondConfiguration");
-            http
+    @Bean
+    @Order(10)
+    public SecurityFilterChain secondChain(HttpSecurity http) throws Exception {
+        http
                 .cors()
                 .and()
                 .authorizeRequests()
@@ -76,7 +55,11 @@ public class DevSecurity {
                 .permitAll()
                 .and().anonymous().and()
                 .httpBasic().disable();
-            return http.build();
-        }
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
